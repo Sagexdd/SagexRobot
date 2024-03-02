@@ -379,7 +379,7 @@ def Fallen_about_callback(update: Update, context: CallbackContext):
                         ),
                         InlineKeyboardButton(
                             text="sᴏᴜʀᴄᴇ",
-                            url=f"https://github.com/Sagexdd/SagexRobot,
+                            url=f"https://github.com/Sagexdd/SagexRobot",
                         ),
                     ],
                     [
