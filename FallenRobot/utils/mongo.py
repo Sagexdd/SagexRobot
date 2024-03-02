@@ -2,7 +2,7 @@ from motor.motor_asyncio import AsyncIOMotorClient as MongoCli
 
 from FallenRobot import MONGO_DB_URI
 
-mongo = MongoCli(mongodb+srv://Sagexbot:sxge.exe@cluster0.gdxmsqn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0) 
+mongo = MongoCli(MONGO_DB_URI) 
 db = mongo.Sagexbot
 
 coupledb = db.couple
