@@ -1,64 +1,60 @@
-from datetime import datetime
-from pyrogram import filters
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from VIPMUSIC import app
-from VIPMUSIC.core.call import VIP
-from VIPMUSIC.utils import bot_sys_stats
-from VIPMUSIC.utils.decorators.language import language
-from VIPMUSIC.utils.inline import supp_markup
-from config import BANNED_USERS
-import aiohttp
-import asyncio
-from io import BytesIO
-from PIL import Image, ImageEnhance  # Add these imports
+import time
 
-async def make_carbon(code):
-    url = "https://carbonara.solopov.dev/api/cook"
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, json={"code": code}) as resp:
-            image = BytesIO(await resp.read())
+from telegram import ParseMode, Update
+from telegram.ext import CallbackContext
 
-    # Open the image using PIL
-    carbon_image = Image.open(image)
+from FallenRobot import StartTime, dispatcher
+from FallenRobot.modules.disable import DisableAbleCommandHandler
 
-    # Increase brightness
-    enhancer = ImageEnhance.Brightness(carbon_image)
-    bright_image = enhancer.enhance(1.7)  # Adjust the enhancement factor as needed
 
-    # Save the modified image to BytesIO object with increased quality
-    output_image = BytesIO()
-    bright_image.save(output_image, format='PNG', quality=95)  # Adjust quality as needed
-    output_image.name = "carbon.png"
-    return output_image
+def get_readable_time(seconds: int) -> str:
+    count = 0
+    ping_time = ""
+    time_list = []
+    time_suffix_list = ["s", "ᴍ", "ʜ", "ᴅᴀʏs"]
 
-@app.on_message(filters.command("ping", prefixes=["/", "!", "%", ",", "", ".", "@", "#"]) & ~BANNED_USERS)
-@language
-async def ping_com(client, message: Message, _):
-    PING_IMG_URL = "https://telegra.ph/file/37b57c6aaaa793bba055a.jpg"
-    captionss = "**🥀ᴘɪɴɢɪɴɢ ᴏᴜʀ sᴇʀᴠᴇʀ ᴡᴀɪᴛ.**"
-    response = await message.reply_photo(PING_IMG_URL, caption=(captionss))
-    await asyncio.sleep(1)
-    await response.edit_caption("**🥀ᴘɪɴɢɪɴɢ ᴏᴜʀ sᴇʀᴠᴇʀ ᴡᴀɪᴛ...**")
-    await asyncio.sleep(1)
-    await response.edit_caption("**🥀ᴘɪɴɢɪɴɢ ᴏᴜʀ sᴇʀᴠᴇʀ ᴡᴀɪᴛ.**")
-    await asyncio.sleep(1)
-    await response.edit_caption("**🥀ᴘɪɴɢɪɴɢ ᴏᴜʀ sᴇʀᴠᴇʀ ᴡᴀɪᴛ..**")
-    await asyncio.sleep(1.5)
-    await response.edit_caption("**🥀ᴘɪɴɢɪɴɢ ᴏᴜʀ sᴇʀᴠᴇʀ ᴡᴀɪᴛ...**")
-    await asyncio.sleep(2)
-    await response.edit_caption("**🥀ᴘɪɴɢɪɴɢ ᴏᴜʀ sᴇʀᴠᴇʀ ᴡᴀɪᴛ....**")
-    await asyncio.sleep(2)
-    await response.edit_caption("**📡sʏsᴛᴇᴍ ᴅᴀᴛᴀ ᴀɴᴀʟʏsᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ !**")
-    await asyncio.sleep(3)
-    await response.edit_caption("**📩sᴇɴᴅɪɴɢ sʏsᴛᴇᴍ ᴀɴᴀʟʏsᴇᴅ ᴅᴀᴛᴀ ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...**")
-    start = datetime.now()
-    pytgping = await VIP.ping()
-    UP, CPU, RAM, DISK = await bot_sys_stats()
-    resp = (datetime.now() - start).microseconds / 1000
-    text =  _["ping_2"].format(resp, app.name, UP, RAM, CPU, DISK, pytgping)
-    carbon = await make_carbon(text)
-    captions = "ᴊᴀɪ sʜʀᴇᴇ ʀᴀᴍ"
-    await message.reply_photo((carbon), caption=captions,
-    
-        )
-    await response.delete()
+    while count < 4:
+        count += 1
+        if count < 3:
+            remainder, result = divmod(seconds, 60)
+        else:
+            remainder, result = divmod(seconds, 24)
+        if seconds == 0 and remainder == 0:
+            break
+        time_list.append(int(result))
+        seconds = int(remainder)
+
+    for x in range(len(time_list)):
+        time_list[x] = str(time_list[x]) + time_suffix_list[x]
+    if len(time_list) == 4:
+        ping_time += time_list.pop() + ", "
+
+    time_list.reverse()
+    ping_time += ":".join(time_list)
+
+    return ping_time
+
+
+def ping(update: Update, context: CallbackContext):
+    msg = update.effective_message
+
+    start_time = time.time()
+    message = msg.reply_text("🏓 ᴘɪɴɢɪɴɢ ʙᴀʙʏ....​")
+    end_time = time.time()
+    telegram_ping = str(round((end_time - start_time) * 1000, 3)) + " ms"
+    uptime = get_readable_time((time.time() - StartTime))
+
+    message.edit_text(
+        "ɪ ᴀᴍ ᴀʟɪᴠᴇ ʙᴀʙʏ! 🖤\n"
+        "<b>ᴛɪᴍᴇ ᴛᴀᴋᴇɴ:</b> <code>{}</code>\n"
+        "<b>ᴜᴘᴛɪᴍᴇ:</b> <code>{}</code>".format(telegram_ping, uptime),
+        parse_mode=ParseMode.HTML,
+    )
+
+
+PING_HANDLER = DisableAbleCommandHandler("ping", ping, run_async=True)
+dispatcher.add_handler(PING_HANDLER)
+
+__command_list__ = ["ping"]
+
+__handlers__ = [PING_HANDLER]
